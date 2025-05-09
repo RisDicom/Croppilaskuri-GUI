@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.Python
+*.egg-info/
+.Python
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+pip-selfcheck.json
+
+# PyInstaller
+build/
+dist/
+*.spec
+
+# Muut projektikohtaiset tiedostot, joita ei haluta versionhallintaan
+*.log
+*.tmp
+*.bak
+*.swp
+*.html 
+
+# IDE-kohtaiset kansiot
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Windowsin thumbnail-välimuisti
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
