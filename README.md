@@ -59,7 +59,7 @@ Voit asentaa tarvittavat kirjastot esimerkiksi Pip-työkalulla:
 
 ## Tekijä
 
-* Risto Hirvilammi (rijohi)
+* Risto Hirvilammi (RisDicom)
 
 ## Lisenssi
 
