@@ -5,7 +5,7 @@ Sisältää mm. sovellusversion, käyttöliittymässä käytettävät emojit ja 
 sekä yleisesti tunnettujen riskielinten (OAR) nimet.
 """
 
-APP_VERSION = "v0.2.3-alpha" # <--- SOVELLUKSEN VERSIO PÄIVITETTY (workflow & CTV crop fix)
+APP_VERSION = "v0.2.5-alpha" # <--- SOVELLUKSEN VERSIO PÄIVITETTY
 
 # --- Emojit ja Värit ---
 EMOJI_COPY = "📋"; EMOJI_CROP_IN = "✂️"; EMOJI_CROP_OUT = "✂️"

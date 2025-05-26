@@ -4,7 +4,7 @@ Pääsovellusluokka EclipseHelperApp, joka sisältää käyttöliittymän
 rakentamisen ja sovelluksen päätoiminnallisuuden.
 """
 import sys
-import os 
+import os
 import datetime
 from functools import partial
 
@@ -16,13 +16,13 @@ from PyQt5.QtWidgets import (
     QCompleter, QRadioButton, QButtonGroup
 )
 from PyQt5.QtCore import Qt, QSize, QStringListModel, QUrl # QUrl lisätty
-from PyQt5.QtGui import QFont, QPixmap, QTextCursor 
+from PyQt5.QtGui import QFont, QPixmap, QTextCursor
 
 from config import (
     APP_VERSION, EMOJI_SEARCH, COLOR_DEFAULT_BG, COMMON_OARS, EMOJI_INFO
 )
-from calculations import calculate_ptv_crop, format_dose 
-from text_utils import bold 
+from calculations import calculate_ptv_crop, format_dose
+from text_utils import bold
 from gui_widgets import StepWidget, OarPtvOverlapDialog
 from guide_logic import generate_guide_steps
 from optimization_criteria import generate_optimization_criteria_html
@@ -76,7 +76,7 @@ class EclipseHelperApp(QWidget):
 
     def initUI(self):
         self.setWindowTitle(f'Eclipse Contouring Helper {APP_VERSION} ({datetime.date.today().strftime("%Y-%m-%d")})')
-        self.setGeometry(30, 30, 1300, 900) 
+        self.setGeometry(30, 30, 1300, 900)
         main_layout = QVBoxLayout(self); main_layout.setContentsMargins(10,10,10,10); main_layout.setSpacing(10)
         top_grid = QGridLayout(); top_grid.setSpacing(10)
 
@@ -110,9 +110,9 @@ class EclipseHelperApp(QWidget):
         self.oar_table_w = QTableWidget(); self.oar_table_w.setColumnCount(3)
         self.oar_table_w.setHorizontalHeaderLabels(["OAR Nimi", "dPTV+OAR Overlapit", "Toiminto"])
         self.oar_table_w.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
-        self.oar_table_w.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents) 
+        self.oar_table_w.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         self.oar_table_w.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
-        self.oar_table_w.setMinimumHeight(130); oar_lo.addWidget(self.oar_table_w) 
+        self.oar_table_w.setMinimumHeight(130); oar_lo.addWidget(self.oar_table_w)
         top_grid.addWidget(oar_gb, 0, 1)
 
         # Options
@@ -146,13 +146,13 @@ class EclipseHelperApp(QWidget):
         gen_lo = QVBoxLayout(gen_cont); gen_lo.setContentsMargins(0,0,0,0)
         self.gen_btn = QPushButton("Generoi Ohjeet"); self.gen_btn.setObjectName("GenerateButton")
         self.gen_btn.setIconSize(QSize(18,18)); self.gen_btn.clicked.connect(self.generate_output)
-        gen_lo.addSpacerItem(QSpacerItem(20,10,QSizePolicy.Minimum, QSizePolicy.Expanding)) 
+        gen_lo.addSpacerItem(QSpacerItem(20,10,QSizePolicy.Minimum, QSizePolicy.Expanding))
         gen_lo.addWidget(self.gen_btn)
-        gen_lo.addSpacerItem(QSpacerItem(20,10,QSizePolicy.Minimum, QSizePolicy.Expanding)) 
+        gen_lo.addSpacerItem(QSpacerItem(20,10,QSizePolicy.Minimum, QSizePolicy.Expanding))
         top_grid.addWidget(gen_cont, 1, 1, Qt.AlignVCenter | Qt.AlignHCenter)
 
         top_grid.setColumnStretch(0,1); top_grid.setColumnStretch(1,1)
-        top_grid.setRowMinimumHeight(0,200); top_grid.setRowMinimumHeight(1,150) 
+        top_grid.setRowMinimumHeight(0,200); top_grid.setRowMinimumHeight(1,150)
         main_layout.addLayout(top_grid)
 
 
@@ -161,7 +161,7 @@ class EclipseHelperApp(QWidget):
         # Guide Tab
         self.guide_tab_w = QWidget()
         guide_lo = QVBoxLayout(self.guide_tab_w); guide_lo.setContentsMargins(0,5,0,0); guide_lo.setSpacing(5)
-        search_lo = QHBoxLayout(); search_lo.setContentsMargins(5,0,5,0) 
+        search_lo = QHBoxLayout(); search_lo.setContentsMargins(5,0,5,0)
         search_icon = QLabel(EMOJI_SEARCH); search_icon.setStyleSheet("font-size: 12pt;")
         self.search_in = QLineEdit(); self.search_in.setObjectName("SearchLineEdit"); self.search_in.setPlaceholderText("Etsi ohjeista...")
         self.search_in.textChanged.connect(self._on_search_text_changed); self.search_in.returnPressed.connect(self._find_next)
@@ -173,13 +173,13 @@ class EclipseHelperApp(QWidget):
         search_lo.addWidget(search_icon); search_lo.addWidget(self.search_in,1); search_lo.addWidget(self.find_prev_btn); search_lo.addWidget(self.find_next_btn); search_lo.addWidget(self.clear_search_btn)
         guide_lo.addLayout(search_lo)
 
-        prog_area_lo = QHBoxLayout(); prog_area_lo.setContentsMargins(5,0,5,0); prog_area_lo.addStretch(1) 
+        prog_area_lo = QHBoxLayout(); prog_area_lo.setContentsMargins(5,0,5,0); prog_area_lo.addStretch(1)
         self.prog_lbl = QLabel("Vaiheet: 0 / 0"); self.prog_lbl.setFont(QFont("Segoe UI",9)); self.prog_lbl.setStyleSheet("QLabel{margin-right:5px; color:#555;}")
         prog_area_lo.addWidget(self.prog_lbl); guide_lo.addLayout(prog_area_lo)
 
         self.scroll = QScrollArea(); self.scroll.setWidgetResizable(True); self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff); self.scroll.setFrameShape(QFrame.NoFrame)
         self.scroll_w = QWidget(); self.scroll_w.setObjectName("ScrollWidget")
-        self.steps_lo = QVBoxLayout(self.scroll_w); self.steps_lo.setContentsMargins(5,5,10,5); self.steps_lo.setSpacing(0); self.steps_lo.addStretch(1) 
+        self.steps_lo = QVBoxLayout(self.scroll_w); self.steps_lo.setContentsMargins(5,5,10,5); self.steps_lo.setSpacing(0); self.steps_lo.addStretch(1)
         self.scroll.setWidget(self.scroll_w); guide_lo.addWidget(self.scroll,1)
 
         # Criteria Tab
@@ -205,7 +205,7 @@ class EclipseHelperApp(QWidget):
         self.oar_compl.setCaseSensitivity(Qt.CaseInsensitive); self.oar_compl.setCompletionMode(QCompleter.PopupCompletion)
         self.oar_input.setCompleter(self.oar_compl); self.oar_compl.activated.connect(self._add_oar_from_completer)
 
-    def _add_oar_from_completer(self, text): 
+    def _add_oar_from_completer(self, text):
         self.oar_input.setText(text)
         self.add_oar()
 
@@ -217,7 +217,7 @@ class EclipseHelperApp(QWidget):
             if d <= 0: QMessageBox.warning(self, "Virheellinen annos", "Annostason on oltava positiivinen."); return
             if d in self.ptv_doses_list: QMessageBox.warning(self, "Annos jo lisätty", f"Annos {format_dose(d)} Gy on jo listalla."); return
             self.ptv_doses_list.append(d); self.ptv_doses_list.sort(reverse=True)
-            self.update_dose_list_widget(); self.dose_input.clear(); self._update_oar_table_widget() 
+            self.update_dose_list_widget(); self.dose_input.clear(); self._update_oar_table_widget()
         except ValueError: QMessageBox.warning(self, "Virheellinen syöte", f"'{txt}' ei ole numero.")
         self.update_generate_button_state(); self.clear_output()
 
@@ -243,7 +243,7 @@ class EclipseHelperApp(QWidget):
         if removed:
             self.update_dose_list_widget()
             self.update_generate_button_state()
-            self._update_oar_table_widget() 
+            self._update_oar_table_widget()
             self.clear_output()
             self.update_delete_button_state()
 
@@ -263,8 +263,8 @@ class EclipseHelperApp(QWidget):
         if not name: return
         if any(o['name'] == name for o in self.oars_data):
             QMessageBox.warning(self,"OAR jo lisätty", f"OAR '{name}' on jo listalla."); self.oar_input.clear(); return
-        self.oars_data.append({'name':name, 'overlap_with_ptv_doses':[]}) 
-        self.oars_data.sort(key=lambda item: item['name']) 
+        self.oars_data.append({'name':name, 'overlap_with_ptv_doses':[]})
+        self.oars_data.sort(key=lambda item: item['name'])
         self._update_oar_table_widget(); self.oar_input.clear(); self.clear_output()
 
     def _remove_oar_at_row(self, row):
@@ -284,19 +284,19 @@ class EclipseHelperApp(QWidget):
             QMessageBox.information(self,"Ei PTV-annoksia","Syötä PTV-annoksia ensin, jotta voit määrittää päällekkäisyyksiä."); return
 
         dlg = OarPtvOverlapDialog(o_name, self.ptv_doses_list, initially_selected_doses, self)
-        if dlg.exec_() == OarPtvOverlapDialog.Accepted: 
+        if dlg.exec_() == OarPtvOverlapDialog.Accepted:
             self.oars_data[oar_row_idx]['overlap_with_ptv_doses'] = dlg.get_selected_ptv_doses()
             self._update_oar_table_widget()
-            self.clear_output() 
+            self.clear_output()
 
     def _update_oar_table_widget(self):
-        self.oar_table_w.setSortingEnabled(False) 
-        self.oar_table_w.setRowCount(0) 
+        self.oar_table_w.setSortingEnabled(False)
+        self.oar_table_w.setRowCount(0)
         self.oar_table_w.setRowCount(len(self.oars_data))
 
         for i, oar_item in enumerate(self.oars_data):
             name_item = QTableWidgetItem(oar_item['name'])
-            name_item.setFlags(name_item.flags() & ~Qt.ItemIsEditable) 
+            name_item.setFlags(name_item.flags() & ~Qt.ItemIsEditable)
             self.oar_table_w.setItem(i, 0, name_item)
 
             overlap_cell_widget = QWidget()
@@ -304,14 +304,14 @@ class EclipseHelperApp(QWidget):
             overlap_layout.setContentsMargins(2,0,2,0); overlap_layout.setSpacing(4)
 
             btn_configure = QPushButton("Määritä...")
-            btn_configure.setObjectName("ConfigureOARButton") 
+            btn_configure.setObjectName("ConfigureOARButton")
             btn_configure.setToolTip(f"Määritä PTV-päällekkäisyydet OAR:lle {oar_item['name']}")
             btn_configure.clicked.connect(partial(self._configure_oar_ptv_overlaps, oar_row_idx=i))
             overlap_layout.addWidget(btn_configure)
 
             selected_doses = oar_item.get('overlap_with_ptv_doses', [])
             selected_doses_str = ", ".join([format_dose(d) for d in sorted(selected_doses, reverse=True)]) if selected_doses else "Ei valittu"
-            if len(selected_doses_str) > 25: 
+            if len(selected_doses_str) > 25:
                  selected_doses_str = f"{len(selected_doses)} PTV:tä valittu"
             label_selected_doses = QLabel(selected_doses_str)
             label_selected_doses.setStyleSheet("font-size:8pt; color:#555; margin-left:3px;")
@@ -320,10 +320,10 @@ class EclipseHelperApp(QWidget):
             self.oar_table_w.setCellWidget(i, 1, overlap_cell_widget)
 
             btn_delete_oar = QPushButton("Poista")
-            btn_delete_oar.setObjectName("DeleteOARButton") 
+            btn_delete_oar.setObjectName("DeleteOARButton")
             btn_delete_oar.clicked.connect(partial(self._remove_oar_at_row, row=i))
 
-            delete_button_widget = QWidget() 
+            delete_button_widget = QWidget()
             delete_button_layout = QHBoxLayout(delete_button_widget)
             delete_button_layout.addWidget(btn_delete_oar)
             delete_button_layout.setAlignment(Qt.AlignCenter)
@@ -331,11 +331,11 @@ class EclipseHelperApp(QWidget):
             self.oar_table_w.setCellWidget(i, 2, delete_button_widget)
 
         self.oar_table_w.resizeRowsToContents()
-        self.oar_table_w.resizeColumnsToContents() 
-        self.oar_table_w.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch) 
-        self.oar_table_w.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents) 
-        self.oar_table_w.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents) 
-        self.oar_table_w.setSortingEnabled(True) 
+        self.oar_table_w.resizeColumnsToContents()
+        self.oar_table_w.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.oar_table_w.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        self.oar_table_w.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        self.oar_table_w.setSortingEnabled(True)
 
     def clear_output(self):
         if hasattr(self,'steps_lo'):
@@ -345,9 +345,9 @@ class EclipseHelperApp(QWidget):
             self.current_search_index = -1
 
             for widget in self.step_widgets:
-                if widget: 
+                if widget:
                     widget.deleteLater()
-            self.step_widgets.clear() 
+            self.step_widgets.clear()
 
             while self.steps_lo.count():
                  child = self.steps_lo.takeAt(0)
@@ -370,7 +370,7 @@ class EclipseHelperApp(QWidget):
         if hasattr(self,'crit_text'): self.crit_text.clear()
         if hasattr(self,'crop_sum_text'): self.crop_sum_text.clear()
         self.crop_summary_data = {}
-        if hasattr(self,'search_in') and self.search_in: self.search_in.clear() 
+        if hasattr(self,'search_in') and self.search_in: self.search_in.clear()
         if hasattr(self,'find_next_btn'): self.find_next_btn.setEnabled(False)
         if hasattr(self,'find_prev_btn'): self.find_prev_btn.setEnabled(False)
 
@@ -383,16 +383,16 @@ class EclipseHelperApp(QWidget):
             if not hasattr(self,attr):
                 QMessageBox.critical(self,"Käyttöliittymävirhe",f"Elementti '{attr}' puuttuu sovelluksen alustuksesta."); return
 
-        self.clear_output() 
+        self.clear_output()
 
         sorted_doses = sorted(self.ptv_doses_list, reverse=True)
         create_niska = self.niska_cb.isChecked()
-        current_oars_data = list(self.oars_data) 
+        current_oars_data = list(self.oars_data)
         selected_ring_prefix = "NT" if self.ring_rb_nt.isChecked() else "Ring"
         selected_dptv_oar_crop_cm = 0.1 if self.dptv_oar_crop_10.isChecked() else 0.05
 
-        calculated_crops = {} 
-        final_names_for_criteria = {} 
+        calculated_crops = {}
+        final_names_for_criteria = {}
         v_prefix = "v"; ptv_base_name = f"{v_prefix}PTV"; ctv_base_name = f"{v_prefix}CTV"; crop_suffix_raw = "crop"
 
         try:
@@ -419,24 +419,24 @@ class EclipseHelperApp(QWidget):
                 sorted_doses, calculated_crops, create_niska,
                 current_oars_data, selected_ring_prefix, selected_dptv_oar_crop_cm
             )
-            
+
             temp_total_steps = 0
 
             for i, step_data in enumerate(guide_data):
                 step_widget = StepWidget(
-                    step_data.get("id"), 
+                    step_data.get("id"),
                     step_data.get("title","Nimetön vaihe"),
                     step_data.get("details_html","<p>Ei tarkempia ohjeita.</p>"),
-                    step_data.get("emoji", EMOJI_INFO), 
-                    is_alt_row=(i%2==1) 
+                    step_data.get("emoji", EMOJI_INFO),
+                    is_alt_row=(i%2==1)
                 )
-                
+
                 if "toc_anchor_target_id" in step_data:
                     step_widget.toc_anchor_target_id = step_data["toc_anchor_target_id"]
 
-                if step_data.get("id") == 0: 
+                if step_data.get("id") == 0:
                     step_widget.checkbox.setVisible(False)
-                    step_widget.details_label.setOpenExternalLinks(False) 
+                    step_widget.details_label.setOpenExternalLinks(False)
                     step_widget.details_label.linkActivated.connect(self.handle_toc_link_activated) # KORJATTU TÄHÄN
                 else:
                     step_widget.completionChanged.connect(self.update_progress)
@@ -448,9 +448,9 @@ class EclipseHelperApp(QWidget):
                      self.steps_lo.addWidget(step_widget)
 
                 self.step_widgets.append(step_widget)
-            
-            self.total_steps = temp_total_steps 
-            self.completed_steps = 0 
+
+            self.total_steps = temp_total_steps
+            self.completed_steps = 0
 
             criteria_html = generate_optimization_criteria_html(
                 sorted_doses, final_names_for_criteria, create_niska,
@@ -460,28 +460,28 @@ class EclipseHelperApp(QWidget):
 
             self._generate_and_display_crop_summary()
 
-            self.tabs.setCurrentIndex(0) 
+            self.tabs.setCurrentIndex(0)
             self.update_progress_label()
 
         except Exception as e:
             QMessageBox.critical(self,"Generointivirhe",f"Ohjeiden generoinnissa tapahtui virhe: {e}\nTarkista syötteet ja yritä uudelleen.");
             import traceback
-            traceback.print_exc(file=sys.stderr) 
-            self.clear_output() 
+            traceback.print_exc(file=sys.stderr)
+            self.clear_output()
         finally:
             QApplication.restoreOverrideCursor()
 
     def handle_toc_link_activated(self, link_str: str): # KORJATTU METODIN NIMI JA SIGNAATUURI
         """Käsittelee sisällysluettelon linkkien klikkaukset (QLabel.linkActivated)."""
         url = QUrl(link_str) # Muunna merkkijono QUrl-olioksi
-        target_fragment = url.fragment() 
-        
+        target_fragment = url.fragment()
+
         if not target_fragment:
             return
 
         for widget in self.step_widgets:
             if hasattr(widget, 'toc_anchor_target_id') and widget.toc_anchor_target_id == target_fragment:
-                self.scroll.ensureWidgetVisible(widget, yMargin=20) 
+                self.scroll.ensureWidgetVisible(widget, yMargin=20)
                 break
 
     def _generate_and_display_crop_summary(self):
@@ -491,7 +491,7 @@ class EclipseHelperApp(QWidget):
 
         try:
             from config import COLOR_TITLE, COLOR_VALUE
-        except ImportError: 
+        except ImportError:
             COLOR_TITLE = "#003366"
             COLOR_VALUE = "#005000"
 
@@ -508,27 +508,27 @@ class EclipseHelperApp(QWidget):
         </style>"""]
         summary_html.append("<h3>Generoidut Crop-marginaalit</h3><table><tr><th>Vaihe</th><th>Kuvaus</th><th>Marginaali (cm)</th></tr>")
 
-        has_content = False 
-        for step_id in sorted(self.crop_summary_data.keys()): 
+        has_content = False
+        for step_id in sorted(self.crop_summary_data.keys()):
             data = self.crop_summary_data[step_id]
             description = data.get("text","N/A")
             margin_cm = data.get("margin_cm","N/A")
 
             if isinstance(margin_cm, (int, float)) and abs(margin_cm) < 0.001:
-                continue 
-            has_content = True 
+                continue
+            has_content = True
 
             margin_str = f"{margin_cm:.2f}" if isinstance(margin_cm,(int,float)) else str(margin_cm)
             summary_html.append(f"<tr><td class='step'>{step_id}</td><td class='desc'>{description}</td><td class='margin'>{margin_str}</td></tr>")
 
         summary_html.append("</table>")
-        
+
         if not has_content:
             self.crop_sum_text.setHtml("<p><i>Ei crop-marginaaleja näytettäväksi (kaikki olivat 0 cm tai dataa ei ollut).</i></p>")
         else:
             self.crop_sum_text.setHtml("\n".join(summary_html))
 
-    def update_progress(self, is_complete): 
+    def update_progress(self, is_complete):
         self.completed_steps = sum(1 for widget in self.step_widgets if widget.is_complete and widget.checkbox.isVisible() and widget.step_id != 0)
         self.update_progress_label()
 
@@ -545,8 +545,8 @@ class EclipseHelperApp(QWidget):
             self.highlighted_widget.set_highlighted(False)
             self.highlighted_widget=None
 
-        if term != self.last_search_term: 
-            self.current_search_index = -1 
+        if term != self.last_search_term:
+            self.current_search_index = -1
             if self.highlighted_widget:
                 self.highlighted_widget.set_highlighted(False)
                 self.highlighted_widget=None
@@ -554,10 +554,10 @@ class EclipseHelperApp(QWidget):
 
     def _clear_search(self):
         if hasattr(self,'search_in') and self.search_in:
-            self.search_in.clear() 
+            self.search_in.clear()
 
-    def _find_next(self): self._find_search_term(1) 
-    def _find_previous(self): self._find_search_term(-1) 
+    def _find_next(self): self._find_search_term(1)
+    def _find_previous(self): self._find_search_term(-1)
 
     def _find_search_term(self,direction):
         if not hasattr(self,'search_in') or not self.search_in: return
@@ -567,33 +567,33 @@ class EclipseHelperApp(QWidget):
         searchable_widgets = [sw for sw in self.step_widgets if sw.step_id != 0]
         if not searchable_widgets: return
         num_searchable_widgets = len(searchable_widgets)
-        
+
         start_idx = -1
         if self.highlighted_widget and self.highlighted_widget in searchable_widgets:
             try:
                 start_idx = searchable_widgets.index(self.highlighted_widget)
             except ValueError:
-                start_idx = -1 
-        
-        if self.highlighted_widget: 
+                start_idx = -1
+
+        if self.highlighted_widget:
             self.highlighted_widget.set_highlighted(False)
-            self.highlighted_widget=None 
+            self.highlighted_widget=None
 
         found_this_time = False
         for i in range(num_searchable_widgets):
             check_idx = (start_idx + (i * direction) + direction) % num_searchable_widgets
             widget_to_check = searchable_widgets[check_idx]
-            
-            if widget_to_check.contains_text(term): 
+
+            if widget_to_check.contains_text(term):
                 if hasattr(self,'scroll') and self.scroll:
-                    self.scroll.ensureWidgetVisible(widget_to_check, yMargin=50) 
+                    self.scroll.ensureWidgetVisible(widget_to_check, yMargin=50)
                 widget_to_check.set_highlighted(True)
-                self.highlighted_widget=widget_to_check 
-                self.current_search_index = check_idx 
+                self.highlighted_widget=widget_to_check
+                self.current_search_index = check_idx
                 found_this_time = True
                 break
-        
+
         if not found_this_time:
-            self.current_search_index = -1 
-            if start_idx == -1: 
+            self.current_search_index = -1
+            if start_idx == -1:
                  QMessageBox.information(self,"Etsi",f"Tekstiä '{self.search_in.text().strip()}' ei löytynyt ohjeista.");

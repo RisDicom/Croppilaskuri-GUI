@@ -1,7 +1,7 @@
 # Croppilaskuri GUI (Eclipse Contouring Helper)
 
-**Versio:** v0.2.3-alpha
-**Päivitetty:** 16.5.2025
+**Versio:** v0.2.5-alpha
+**Päivitetty:** 26.5.2025
 
 Tämä työkalu on suunniteltu avustamaan Eclipse™-sädehoitojärjestelmän käyttäjiä määrittelytyössä (contouring) luomalla vaiheittaisia ohjeita ja esimerkkejä optimointikriteereistä sädehoidon suunnittelua varten. Sovellus auttaa erityisesti monimutkaisempien PTV- ja OAR-rakenteiden (kuten dPTV, vOARcrop, dPTV+OAR, Ring/NT) luomisessa.
 
@@ -14,6 +14,8 @@ Tämä työkalu on suunniteltu avustamaan Eclipse™-sädehoitojärjestelmän k�
 * **Automaattinen ohjeiden generointi:**
     * Luo vaiheittaisen, kuvitetun (emojit) ohjeen tarvittavien apurakenteiden luomiseksi Eclipseen.
     * Ohjeistaa mm. PTV/CTV-kopioinnissa, Boolean-operaatioissa (Union, Intersection) ja useissa Crop-operaatioissa (PTV-PTV, PTV-CTV, Ring/NT-PTV, OAR-PTV, dPTV-CTV, dPTV vs [dPTV+OAR], vNiska vs PTV/Body).
+    * **Päivitetty Ring/NT-luonti:** Ohjeistaa käyttämään "Extract wall" -työkalua ja luomaan kaikki ringit ensin, jonka jälkeen ne cropataan.
+    * **Korjattu dPTV+OAR-luonti:** Ohjeistaa käyttämään oikeaa `dPTVxx`-rakennetta (eikä `vPTVxxCrop`) Boolean AND -operaatiossa OAR:n kanssa.
     * Luo ohjeet myös syötetyille OAReille (`vOARcrop`-rakenteet).
     * Luo ohjeet `dPTV+OAR`-työkalurakenteille OAR- ja PTV-taso kohtaisesti.
     * Sisältää valinnaisen ohjeen `vNiska`-rakenteen luomiseksi.
