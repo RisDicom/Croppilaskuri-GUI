@@ -121,23 +121,7 @@ class EclipseHelperApp(QWidget):
         opt_lo.addWidget(QLabel(bold("3. Muut valinnat:")))
         self.niska_cb = QCheckBox("Luo vNiska?"); self.niska_cb.setToolTip("Luo vNiska-rakenteen (vaatii SpinalCord).")
         opt_lo.addWidget(self.niska_cb)
-
-        opt_lo.addWidget(QFrame(frameShape=QFrame.HLine, frameShadow=QFrame.Sunken))
-        opt_lo.addWidget(QLabel("Ring/NT Nimi:"))
-        self.ring_grp = QButtonGroup(self)
-        self.ring_rb_ring = QRadioButton("Ring"); self.ring_rb_nt = QRadioButton("NT")
-        self.ring_rb_ring.setChecked(True); self.ring_grp.addButton(self.ring_rb_ring); self.ring_grp.addButton(self.ring_rb_nt)
-        ring_pref_lo = QHBoxLayout(); ring_pref_lo.addWidget(self.ring_rb_ring); ring_pref_lo.addWidget(self.ring_rb_nt); ring_pref_lo.addStretch(1)
-        opt_lo.addLayout(ring_pref_lo)
-
-        opt_lo.addWidget(QFrame(frameShape=QFrame.HLine, frameShadow=QFrame.Sunken))
-        opt_lo.addWidget(QLabel("dPTV+OAR Crop Marginaali:"))
-        self.dptv_oar_crop_grp = QButtonGroup(self)
-        self.dptv_oar_crop_05 = QRadioButton("0.5 mm (0.05 cm)"); self.dptv_oar_crop_10 = QRadioButton("1.0 mm (0.1 cm)")
-        self.dptv_oar_crop_05.setChecked(True); self.dptv_oar_crop_grp.addButton(self.dptv_oar_crop_05); self.dptv_oar_crop_grp.addButton(self.dptv_oar_crop_10)
-        dptv_crop_lo = QHBoxLayout(); dptv_crop_lo.addWidget(self.dptv_oar_crop_05); dptv_crop_lo.addWidget(self.dptv_oar_crop_10); dptv_crop_lo.addStretch(1)
-        opt_lo.addLayout(dptv_crop_lo)
-        opt_lo.addStretch(1)
+        opt_lo.addStretch(1) # Add stretch to push the checkbox to the top
         top_grid.addWidget(opt_gb, 1, 0)
 
 
@@ -378,7 +362,7 @@ class EclipseHelperApp(QWidget):
         if not self.ptv_doses_list:
             QMessageBox.warning(self,"Ei annoksia","Syötä vähintään yksi PTV-annos."); return
 
-        required_attributes = ['niska_cb','steps_lo','crit_text','crop_sum_text','tabs','ring_rb_ring','ring_rb_nt','dptv_oar_crop_05','dptv_oar_crop_10']
+        required_attributes = ['niska_cb','steps_lo','crit_text','crop_sum_text','tabs']
         for attr in required_attributes:
             if not hasattr(self,attr):
                 QMessageBox.critical(self,"Käyttöliittymävirhe",f"Elementti '{attr}' puuttuu sovelluksen alustuksesta."); return
@@ -388,8 +372,10 @@ class EclipseHelperApp(QWidget):
         sorted_doses = sorted(self.ptv_doses_list, reverse=True)
         create_niska = self.niska_cb.isChecked()
         current_oars_data = list(self.oars_data)
-        selected_ring_prefix = "NT" if self.ring_rb_nt.isChecked() else "Ring"
-        selected_dptv_oar_crop_cm = 0.1 if self.dptv_oar_crop_10.isChecked() else 0.05
+
+        # MUUTOKSET TÄSSÄ: Arvot kovakoodattu
+        selected_ring_prefix = "NT"
+        selected_dptv_oar_crop_cm = 0.1
 
         calculated_crops = {}
         final_names_for_criteria = {}
