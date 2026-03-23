@@ -1,0 +1,94 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "croppilaskuri"
+version = "0.4.0"
+description = "Eclipse™ contouring helper – avustaja sädehoidon annossuunnitteluun"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "Risto Hirvilammi", email = "risdicom@users.noreply.github.com" },
+]
+keywords = ["radiation-therapy", "eclipse", "contouring", "medical-physics"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Healthcare Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+dependencies = [
+    "PyQt5>=5.15",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-qt>=4.4",
+    "ruff>=0.9",
+    "mypy>=1.14",
+    "pre-commit>=4.0",
+    "pyinstaller>=6.0",
+]
+
+[project.scripts]
+croppilaskuri = "croppilaskuri.__main__:main"
+
+[project.gui-scripts]
+croppilaskuri-gui = "croppilaskuri.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/croppilaskuri"]
+
+# ── Ruff ────────────────────────────────────────────────────────────────
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "TCH",  # flake8-type-checking
+    "RUF",  # ruff-specific
+]
+ignore = [
+    "E501",   # line length handled by formatter
+    "N815",   # mixedCase variable in class scope (needed for PyQt signals)
+    "RUF002", # ambiguous EN DASH in docstrings
+    "RUF003", # ambiguous unicode characters in comments (emojis)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["croppilaskuri"]
+
+# ── Mypy ────────────────────────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+plugins = []
+
+[[tool.mypy.overrides]]
+module = ["PyQt5.*"]
+ignore_missing_imports = true
+
+# ── Pytest ──────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb="
