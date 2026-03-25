@@ -84,6 +84,7 @@ def format_dose(dose: float) -> str:
 
 # ── Fixed margin accessors ──────────────────────────────────────────────
 
+
 def get_ring_body_outside_crop_margin() -> float:
     """Standard crop margin for Ring vs Body (outside): 0 cm."""
     return 0.0

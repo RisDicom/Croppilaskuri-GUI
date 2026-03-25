@@ -91,10 +91,7 @@ class StepWidget(QFrame):
     def contains_text(self, search_term: str) -> bool:
         """Return ``True`` if *search_term* appears in title or details."""
         term = search_term.lower()
-        return (
-            term in self.title_label.text().lower()
-            or term in self.details_label.text().lower()
-        )
+        return term in self.title_label.text().lower() or term in self.details_label.text().lower()
 
     def set_highlighted(self, on: bool) -> None:
         """Toggle visual search-highlight on this step."""

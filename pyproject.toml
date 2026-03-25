@@ -69,6 +69,7 @@ select = [
 ignore = [
     "E501",   # line length handled by formatter
     "N815",   # mixedCase variable in class scope (needed for PyQt signals)
+    "RUF001",  # ambiguous unicode (EN DASH in HTML strings)
     "RUF002", # ambiguous EN DASH in docstrings
     "RUF003", # ambiguous unicode characters in comments (emojis)
 ]
@@ -88,7 +89,11 @@ plugins = []
 module = ["PyQt5.*"]
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = ["croppilaskuri.ui.*"]
+disable_error_code = ["attr-defined", "union-attr"]
+
 # ── Pytest ──────────────────────────────────────────────────────────────
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-v --tb="
+addopts = "-v --tb=short"

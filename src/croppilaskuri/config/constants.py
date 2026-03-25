@@ -6,19 +6,19 @@ from __future__ import annotations
 APP_VERSION: str = "v0.4.0"
 
 # ── Emoji constants ─────────────────────────────────────────────────────
-EMOJI_COPY: str = "\U0001f4cb"       # 📋
+EMOJI_COPY: str = "\U0001f4cb"  # 📋
 EMOJI_CROP_IN: str = "\u2702\ufe0f"  # ✂️
 EMOJI_CROP_OUT: str = "\u2702\ufe0f"
-EMOJI_UNION: str = "\u2795"          # ➕
-EMOJI_RING: str = "\U0001f48d"       # 💍
-EMOJI_MARGIN: str = "\u2194\ufe0f"   # ↔️
-EMOJI_BOOLEAN: str = "\U0001f9e9"    # 🧩
-EMOJI_CHECK: str = "\U0001f440"      # 👀
+EMOJI_UNION: str = "\u2795"  # ➕
+EMOJI_RING: str = "\U0001f48d"  # 💍
+EMOJI_MARGIN: str = "\u2194\ufe0f"  # ↔️
+EMOJI_BOOLEAN: str = "\U0001f9e9"  # 🧩
+EMOJI_CHECK: str = "\U0001f440"  # 👀
 EMOJI_WARNING: str = "\u26a0\ufe0f"  # ⚠️
-EMOJI_MANUAL: str = "\u270d\ufe0f"   # ✍️
-EMOJI_INFO: str = "\u2139\ufe0f"     # ℹ️
-EMOJI_DONE: str = "\u2705"           # ✅
-EMOJI_SEARCH: str = "\U0001f50d"     # 🔍
+EMOJI_MANUAL: str = "\u270d\ufe0f"  # ✍️
+EMOJI_INFO: str = "\u2139\ufe0f"  # ℹ️
+EMOJI_DONE: str = "\u2705"  # ✅
+EMOJI_SEARCH: str = "\U0001f50d"  # 🔍
 
 # ── UI Colors ───────────────────────────────────────────────────────────
 COLOR_COMPLETED_BG: str = "#e8f5e9"

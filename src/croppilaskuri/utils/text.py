@@ -15,10 +15,7 @@ def bold(text: str) -> str:
 def html_escape(text: str) -> str:
     """Escape basic HTML special characters."""
     return (
-        text.replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-        .replace('"', "&quot;")
+        text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
     )
 
 

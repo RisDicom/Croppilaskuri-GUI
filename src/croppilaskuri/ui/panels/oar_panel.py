@@ -44,6 +44,8 @@ class OarInputPanel(QFrame):
         self.setFrameShape(QFrame.StyledPanel)
 
         self._oars: list[OarEntry] = []
+        self._available_doses: list[float] = []
+        self._overlaps_enabled: bool = True
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 8, 10, 8)
@@ -62,6 +64,15 @@ class OarInputPanel(QFrame):
         entry_row.addWidget(add_btn)
         layout.addLayout(entry_row)
 
+        # Overlap disabled banner (hidden by default)
+        self._overlap_banner = QLabel(
+            "<i style='color:#888;'>OAR-päällekkäisyydet eivät ole "
+            "käytössä palliatiivisessa suunnitelmassa.</i>"
+        )
+        self._overlap_banner.setWordWrap(True)
+        self._overlap_banner.setVisible(False)
+        layout.addWidget(self._overlap_banner)
+
         self._table = QTableWidget()
         self._table.setColumnCount(3)
         self._table.setHorizontalHeaderLabels(["OAR Nimi", "dPTV+OAR Overlapit", "Toiminto"])
@@ -78,7 +89,9 @@ class OarInputPanel(QFrame):
     @property
     def oars_data(self) -> list[OarEntry]:
         """Return a copy of the current OAR data list."""
-        return list(self._oars)
+        import copy
+
+        return copy.deepcopy(self._oars)
 
     def remove_dose_from_overlaps(self, dose: float) -> None:
         """Remove a dose from every OAR's overlap list (after dose deletion)."""
@@ -90,6 +103,20 @@ class OarInputPanel(QFrame):
 
     def refresh_table(self) -> None:
         """Public trigger to re-render the table (e.g. after dose changes)."""
+        self._refresh_table()
+
+    def set_available_doses(self, doses: list[float]) -> None:
+        """Store the current dose list for use in the overlap dialog."""
+        self._available_doses = sorted(doses, reverse=True)
+
+    def set_overlaps_enabled(self, enabled: bool) -> None:
+        """Enable or disable overlap configuration (e.g. for palliative plans).
+
+        When disabled, the "Määritä..." buttons are grayed out and a banner
+        explains why.  The OAR list itself remains editable.
+        """
+        self._overlaps_enabled = enabled
+        self._overlap_banner.setVisible(not enabled)
         self._refresh_table()
 
     # ── Slots ───────────────────────────────────────────────────────
@@ -109,10 +136,6 @@ class OarInputPanel(QFrame):
         self._refresh_table()
         self._input.clear()
         self.oarsChanged.emit()
-
-    def set_available_doses(self, doses: list[float]) -> None:
-        """Store the current dose list for use in the overlap dialog."""
-        self._available_doses = sorted(doses, reverse=True)
 
     # ── Internals ───────────────────────────────────────────────────
 
@@ -138,10 +161,11 @@ class OarInputPanel(QFrame):
         if not (0 <= row < len(self._oars)):
             return
         entry = self._oars[row]
-        doses = getattr(self, "_available_doses", [])
+        doses = self._available_doses
         if not doses:
             QMessageBox.information(
-                self, "Ei PTV-annoksia",
+                self,
+                "Ei PTV-annoksia",
                 "Syötä PTV-annoksia ensin, jotta voit määrittää päällekkäisyyksiä.",
             )
             return
@@ -178,18 +202,26 @@ class OarInputPanel(QFrame):
             btn_cfg.setObjectName("ConfigureOARButton")
             btn_cfg.setToolTip(f"Määritä PTV-päällekkäisyydet OAR:lle {entry['name']}")
             btn_cfg.clicked.connect(partial(self._configure_overlaps, row=i))
+
+            # Disable overlap button when overlaps are disabled (palliative)
+            btn_cfg.setEnabled(self._overlaps_enabled)
             overlap_layout.addWidget(btn_cfg)
 
             selected: list[float] = entry.get("overlap_with_ptv_doses", [])
-            if selected:
+            if not self._overlaps_enabled:
+                doses_text = "Ei käytössä"
+                label_color = "#aaa"
+            elif selected:
                 doses_text = ", ".join(format_dose(d) for d in sorted(selected, reverse=True))
                 if len(doses_text) > 25:
                     doses_text = f"{len(selected)} PTV:tä valittu"
+                label_color = "#555"
             else:
                 doses_text = "Ei valittu"
+                label_color = "#555"
 
             lbl = QLabel(doses_text)
-            lbl.setStyleSheet("font-size:8pt; color:#555; margin-left:3px;")
+            lbl.setStyleSheet(f"font-size:8pt; color:{label_color}; margin-left:3px;")
             overlap_layout.addWidget(lbl)
             overlap_layout.addStretch()
             self._table.setCellWidget(i, 1, overlap_widget)

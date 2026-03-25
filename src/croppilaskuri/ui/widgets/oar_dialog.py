@@ -50,9 +50,7 @@ class OarPtvOverlapDialog(QDialog):
             layout.addWidget(cb)
             self._checkboxes.append((dose, cb))
 
-        buttons = QDialogButtonBox(
-            QDialogButtonBox.Ok | QDialogButtonBox.Cancel
-        )
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)

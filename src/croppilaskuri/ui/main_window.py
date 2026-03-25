@@ -12,6 +12,7 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (
     QApplication,
     QCheckBox,
+    QComboBox,
     QFrame,
     QGridLayout,
     QHBoxLayout,
@@ -42,6 +43,7 @@ from croppilaskuri.config.constants import (
 from croppilaskuri.core.calculations import calculate_ptv_crop, format_dose
 from croppilaskuri.core.guide_logic import generate_guide_steps
 from croppilaskuri.core.optimization_criteria import generate_optimization_criteria_html
+from croppilaskuri.core.types import OarEntry, PlanType
 from croppilaskuri.ui.panels.dose_panel import DoseInputPanel
 from croppilaskuri.ui.panels.oar_panel import OarInputPanel
 from croppilaskuri.ui.styles import get_global_stylesheet
@@ -63,6 +65,16 @@ class MainWindow(QWidget):
 
         self._init_ui()
         self.setStyleSheet(get_global_stylesheet())
+
+    # ═══════════════════════════════════════════════════════════════
+    # Properties
+    # ═══════════════════════════════════════════════════════════════
+
+    @property
+    def selected_plan_type(self) -> PlanType:
+        """Return the currently selected plan type."""
+        idx = self._plan_type_combo.currentIndex()
+        return list(PlanType)[idx]
 
     # ═══════════════════════════════════════════════════════════════
     # UI Construction
@@ -97,6 +109,27 @@ class MainWindow(QWidget):
         opt_lo.setContentsMargins(10, 8, 10, 8)
         opt_lo.setSpacing(8)
         opt_lo.addWidget(QLabel("<b>3. Muut valinnat:</b>"))
+
+        # ── Plan type selector ───────────────────────────────────
+        plan_row = QHBoxLayout()
+        plan_row.addWidget(QLabel("Suunnitelmatyyppi:"))
+        self._plan_type_combo = QComboBox()
+        for pt in PlanType:
+            self._plan_type_combo.addItem(pt.label_fi)
+        self._plan_type_combo.setCurrentIndex(0)
+        self._plan_type_combo.currentIndexChanged.connect(self._on_plan_type_changed)
+        plan_row.addWidget(self._plan_type_combo, 1)
+        opt_lo.addLayout(plan_row)
+
+        # ── Palliative info label (hidden by default) ────────────
+        self._palliative_info = QLabel(
+            "<i style='color:#1565c0;'>Palliatiivisessa suunnitelmassa "
+            "OAR-päällekkäisyydet eivät ole käytössä.</i>"
+        )
+        self._palliative_info.setWordWrap(True)
+        self._palliative_info.setVisible(False)
+        opt_lo.addWidget(self._palliative_info)
+
         self._niska_cb = QCheckBox("Luo vNiska?")
         self._niska_cb.setToolTip("Luo vNiska-rakenteen (vaatii SpinalCord).")
         opt_lo.addWidget(self._niska_cb)
@@ -219,6 +252,13 @@ class MainWindow(QWidget):
     # Event Handlers
     # ═══════════════════════════════════════════════════════════════
 
+    def _on_plan_type_changed(self, _index: int) -> None:
+        """React to plan type combo changes."""
+        is_palliative = self.selected_plan_type == PlanType.PALLIATIVE
+        self._oar_panel.set_overlaps_enabled(not is_palliative)
+        self._palliative_info.setVisible(is_palliative)
+        self._clear_output()
+
     def _on_doses_changed(self) -> None:
         """React to additions/removals in the dose panel."""
         doses = self._dose_panel.doses
@@ -269,7 +309,13 @@ class MainWindow(QWidget):
         self._clear_output()
         sorted_doses = sorted(doses, reverse=True)
         create_niska = self._niska_cb.isChecked()
-        oars = self._oar_panel.oars_data
+        plan_type = self.selected_plan_type
+
+        # For palliative plans, pass empty OAR overlap data
+        oars: list[OarEntry] = self._oar_panel.oars_data  # type: ignore[assignment]
+        if plan_type == PlanType.PALLIATIVE:
+            for oar in oars:
+                oar["overlap_with_ptv_doses"] = []
 
         # Pre-compute crops and final structure names
         calculated_crops: dict[tuple[float, float], dict[str, float]] = {}
@@ -298,13 +344,22 @@ class MainWindow(QWidget):
             QApplication.setOverrideCursor(Qt.WaitCursor)
 
             guide_data, self._crop_summary = generate_guide_steps(
-                sorted_doses, calculated_crops, create_niska,
-                oars, DEFAULT_RING_PREFIX, DEFAULT_DPTV_OAR_CROP_CM,
+                sorted_doses,
+                calculated_crops,
+                create_niska,
+                oars,
+                DEFAULT_RING_PREFIX,
+                DEFAULT_DPTV_OAR_CROP_CM,
             )
             self._populate_guide_steps(guide_data)
 
             criteria_html = generate_optimization_criteria_html(
-                sorted_doses, final_names, create_niska, oars, DEFAULT_RING_PREFIX,
+                sorted_doses,
+                final_names,
+                create_niska,
+                oars,
+                DEFAULT_RING_PREFIX,
+                plan_type=plan_type,
             )
             self._criteria_text.setHtml(criteria_html)
             self._render_crop_summary()
@@ -313,12 +368,14 @@ class MainWindow(QWidget):
 
         except NotImplementedError as exc:
             QMessageBox.information(
-                self, "Ei vielä toteutettu",
+                self,
+                "Ei vielä toteutettu",
                 f"{exc}\n\nKopioi alkuperäisen koodin logiikka uuteen moduulirakenteeseen.",
             )
         except Exception as exc:
             QMessageBox.critical(
-                self, "Generointivirhe",
+                self,
+                "Generointivirhe",
                 f"Ohjeiden generoinnissa tapahtui virhe:\n{exc}\n\n"
                 "Tarkista syötteet ja yritä uudelleen.",
             )
@@ -378,15 +435,14 @@ class MainWindow(QWidget):
 
     def _on_step_completion_changed(self, _is_complete: bool) -> None:
         self._completed_steps = sum(
-            1 for w in self._step_widgets
+            1
+            for w in self._step_widgets
             if w.is_complete and w.checkbox.isVisible() and w.step_id != 0
         )
         self._update_progress_label()
 
     def _update_progress_label(self) -> None:
-        self._progress_label.setText(
-            f"Vaiheet: {self._completed_steps} / {self._total_steps}"
-        )
+        self._progress_label.setText(f"Vaiheet: {self._completed_steps} / {self._total_steps}")
 
     # ═══════════════════════════════════════════════════════════════
     # Search
@@ -446,7 +502,8 @@ class MainWindow(QWidget):
         self._current_search_idx = -1
         if start == -1:
             QMessageBox.information(
-                self, "Etsi",
+                self,
+                "Etsi",
                 f"Tekstiä '{self._search_input.text().strip()}' ei löytynyt ohjeista.",
             )
 
